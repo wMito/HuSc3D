@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Human Sculpture Dataset">
+  <meta name="keywords" content="HuSc3D, dataset, 3dgs, gaussian splatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HuSc3D: Human Sculpture Dataset</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./lib/three.module.js",
+        "gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+      }
+    }
+  </script>
+
+  <script type="module">
+    // Your JavaScript code (from below) will go here
+    import * as GaussianSplats3D from 'gaussian-splats-3d';
+    import * as THREE from 'three';
+
+    // 1. Get a reference to your target div
+    const jaroslawDiv = document.getElementById('jaroslaw-viewer');
+    const hannaDiv = document.getElementById('hanna-viewer');
+    const kacperDiv = document.getElementById('kacper-viewer');
+    const paulinaDiv = document.getElementById('paulina-viewer');
+    const tosiaDiv = document.getElementById('tosia-viewer');
+    const wiktorDiv = document.getElementById('wiktor-viewer');
+
+    // 2. Get dimensions from the target div
+    //    clientWidth/clientHeight give the inner dimensions, excluding padding/border
+    const jaroslawWidth = jaroslawDiv.clientWidth;
+    const jaroslawHeight = jaroslawDiv.clientHeight;
+    const hannaWidth = hannaDiv.clientWidth;
+    const hannaHeight = hannaDiv.clientHeight;
+    const kacperWidth = kacperDiv.clientWidth;
+    const kacperHeight = kacperDiv.clientHeight;
+    const paulinaWidth = paulinaDiv.clientWidth;
+    const paulinaHeight = paulinaDiv.clientHeight;
+    const tosiaWidth = tosiaDiv.clientWidth;
+    const tosiaHeight = tosiaDiv.clientHeight;
+    const wiktorWidth = wiktorDiv.clientWidth;
+    const wiktorHeight = wiktorDiv.clientHeight;
+
+    // The 'rootElement' in your original code is now effectively 'jaroslawDiv'.
+    // No need to create a new div or set its style if CSS handles it.
+    // No need to append to document.body.
+
+    const jaroslawRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+    const hannaRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+    const kacperRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+    const paulinaRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+    const tosiaRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+    const wiktorRenderer = new THREE.WebGLRenderer({
+        antialias: false // Your setting, 'true' is often preferred for smoother edges
+    });
+
+    jaroslawRenderer.setClearColor( 0xffffff, 0);
+    jaroslawRenderer.setSize(jaroslawWidth, jaroslawHeight);
+    hannaRenderer.setClearColor( 0xffffff, 0);
+    hannaRenderer.setSize(hannaWidth, hannaHeight);
+    kacperRenderer.setClearColor( 0xffffff, 0);
+    kacperRenderer.setSize(kacperWidth, kacperHeight);
+    paulinaRenderer.setClearColor( 0xffffff, 0);
+    paulinaRenderer.setSize(paulinaWidth, paulinaHeight);
+    tosiaRenderer.setClearColor( 0xffffff, 0);
+    tosiaRenderer.setSize(tosiaWidth, tosiaHeight);
+    wiktorRenderer.setClearColor( 0xffffff, 0);
+    wiktorRenderer.setSize(wiktorWidth, wiktorHeight);
+
+    // 3. Append the renderer's canvas to YOUR target div
+    jaroslawDiv.appendChild(jaroslawRenderer.domElement);
+    hannaDiv.appendChild(hannaRenderer.domElement);
+    kacperDiv.appendChild(kacperRenderer.domElement);
+    paulinaDiv.appendChild(paulinaRenderer.domElement);
+    tosiaDiv.appendChild(tosiaRenderer.domElement);
+    wiktorDiv.appendChild(wiktorRenderer.domElement);
+
+    const jaroslawCamera = new THREE.PerspectiveCamera(8, jaroslawWidth / jaroslawHeight, 0.1, 500);
+    // Initial camera position (you might want to adjust this based on your model)
+    jaroslawCamera.position.copy(new THREE.Vector3().fromArray([-0.6931, -1.5097, 5.82261])); // Adjusted for better default view 
+    jaroslawCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+    jaroslawCamera.lookAt(new THREE.Vector3(0, 0, 0)); // Look at origin
+    
+    const hannaCamera = new THREE.PerspectiveCamera(12, hannaWidth / hannaHeight, 0.1, 500);
+    hannaCamera.position.copy(new THREE.Vector3().fromArray([0.35731322, -0.04053932,  -5.89350775])); // Adjusted for better default view
+    hannaCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+    hannaCamera.lookAt(new THREE.Vector3(0.23360206, 0.31936655, 4.96875734)); // Look at origin
+
+    const kacperCamera = new THREE.PerspectiveCamera(35, kacperWidth / kacperHeight, 0.1, 500);
+    kacperCamera.position.copy(new THREE.Vector3().fromArray([-0.37983131, -1.51347585,  4.68128273])); // Adjusted for better default view
+    kacperCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+
+    const paulinaCamera = new THREE.PerspectiveCamera(75, paulinaWidth / paulinaHeight, 0.1, 500);
+    paulinaCamera.position.copy(new THREE.Vector3().fromArray([1.2476014, -1.3152583, 2.9082773])); // Adjusted for better default view
+    paulinaCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+
+    const tosiaCamera = new THREE.PerspectiveCamera(35, tosiaWidth / tosiaHeight, 0.1, 500);
+    tosiaCamera.position.copy(new THREE.Vector3().fromArray([-0.8009536, 1.9206415, 7.3797903])); // Adjusted for better default view
+    tosiaCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+    
+
+    const wiktorCamera = new THREE.PerspectiveCamera(65, wiktorWidth / wiktorHeight, 0.1, 500);
+    wiktorCamera.position.copy(new THREE.Vector3().fromArray([-0.11039128, -1.19087729,  -4.76674734])); // Adjusted for better default view
+    wiktorCamera.up = new THREE.Vector3(0, -1, 0); // Standard up vector
+    wiktorCamera.lookAt(new THREE.Vector3(0, 0, 0)); // Look at origin
+
+    // Corrected typos in your viewer options (backticks ` ` to single quotes ' ')
+    const jaroslawViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': jaroslawRenderer,
+        'camera': jaroslawCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const jaroslawSplatFilePath = 'https://e3dgsar.org/api/data/jaroslaw.ply';
+    jaroslawViewer.addSplatScene(jaroslawSplatFilePath)
+    .then(() => {
+        console.log('Splat scene loaded!');
+        // Add axes helper to the scene after it's loaded
+        requestAnimationFrame(jaroslawAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+        jaroslawDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+
+    console.log('jaroslawViewer type:', typeof jaroslawViewer);
+    console.log('jaroslawViewer:', jaroslawViewer);
+
+    const hannaViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': hannaRenderer,
+        'camera': hannaCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const hannaSplatFilePath = 'https://e3dgsar.org/api/data/hanna.ply';
+    hannaViewer.addSplatScene(hannaSplatFilePath, {
+      'position': [-0.3, -.2, 0]
+    })
+    .then(() => {
+        console.log('Splat scene loaded!');
+        requestAnimationFrame(hannaAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+        hannaDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+
+    const kacperViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': kacperRenderer,
+        'camera': kacperCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const kacperSplatFilePath = 'https://e3dgsar.org/api/data/kacper.ply';
+    // const splatFilePath = '<path to .ply, .ksplat, or .splat file>';
+    kacperViewer.addSplatScene(kacperSplatFilePath, {
+      'position': [0, -1.2, 0.]
+    })
+    .then(() => {
+        console.log('Splat scene loaded!');
+        requestAnimationFrame(kacperAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+        kacperDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+
+    const paulinaViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': paulinaRenderer,
+        'camera': paulinaCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const paulinaSplatFilePath = 'https://e3dgsar.org/api/data/paulina.ply';
+    paulinaViewer.addSplatScene(paulinaSplatFilePath, {
+      'position': [1, -1.6, -0.4]
+    })
+    .then(() => {
+        console.log('Splat scene loaded!');
+        requestAnimationFrame(paulinaAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+          paulinaDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+
+    const tosiaViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': tosiaRenderer,
+        'camera': tosiaCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const tosiaSplatFilePath = 'https://e3dgsar.org/api/data/tosia.ply';
+    // const splatFilePath = '<path to .ply, .ksplat, or .splat file>';
+    tosiaViewer.addSplatScene(tosiaSplatFilePath, {
+      'position': [0.7, -1., 0]
+    })
+    .then(() => {
+        console.log('Splat scene loaded!');
+        requestAnimationFrame(tosiaAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+          tosiaDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+    
+    const wiktorViewer = new GaussianSplats3D.Viewer({
+        'selfDrivenMode': false,
+        'renderer': wiktorRenderer,
+        'camera': wiktorCamera,
+        'sharedMemoryForWorkers': true,
+        'webXRMode': GaussianSplats3D.WebXRMode.None,
+        'renderMode': GaussianSplats3D.RenderMode.OnChange,
+        'sphericalHarmonicsDegree': 0,
+    });
+
+    const wiktorSplatFilePath = 'https://e3dgsar.org/api/data/wiktor.ply';
+    wiktorViewer.addSplatScene(wiktorSplatFilePath, {
+      'position': [6, -3., 0],
+      'scale': [2, 2, 2]
+    })
+    .then(() => {
+        console.log('Splat scene loaded!');
+        requestAnimationFrame(wiktorAnimate);
+    })
+    .catch(error => {
+        console.error('Error loading splat scene:', error);
+          wiktorDiv.innerHTML = `<p style="color: red; padding: 10px;">Error loading 3D model: ${error.message || error}. Check console.</p>`;
+    });
+
+    function jaroslawAnimate() {
+        if (!jaroslawViewer.selfDrivenMode) {
+            jaroslawViewer.update(); // Update viewer state (e.g., sorting if necessary)
+            jaroslawViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(jaroslawAnimate);
+    }
+
+    function hannaAnimate() {
+        // If you were using custom controls (like THREE.OrbitControls),
+        // you would update them here: e.g., controls.update();
+
+        if (!hannaViewer.selfDrivenMode) {
+            hannaViewer.update(); // Update viewer state (e.g., sorting if necessary)
+            hannaViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(hannaAnimate);
+    }
+
+    function kacperAnimate() {
+        // If you were using custom controls (like THREE.OrbitControls),
+        // you would update them here: e.g., controls.update();
+
+        if (!kacperViewer.selfDrivenMode) {
+            kacperViewer.update(); // Update viewer state (e.g., sorting if necessary)
+            kacperViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(kacperAnimate);
+    }
+
+    function paulinaAnimate() {
+        // If you were using custom controls (like THREE.OrbitControls),
+        // you would update them here: e.g., controls.update();
+
+        if (!paulinaViewer.selfDrivenMode) {
+            paulinaViewer.update(); // Update viewer state (e.g., sorting if necessary)
+            paulinaViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(paulinaAnimate);
+    }
+
+    function tosiaAnimate() {
+        // If you were using custom controls (like THREE.OrbitControls),
+        // you would update them here: e.g., controls.update();
+
+        if (!tosiaViewer.selfDrivenMode) {
+            tosiaViewer.update(); // Update viewer state (e.g., sorting if necessary) 
+            tosiaViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(tosiaAnimate);
+    } 
+
+    function wiktorAnimate() {
+        // If you were using custom controls (like THREE.OrbitControls),
+        // you would update them here: e.g., controls.update();
+
+        if (!wiktorViewer.selfDrivenMode) { 
+            wiktorViewer.update(); // Update viewer state (e.g., sorting if necessary) 
+            wiktorViewer.render(); // Render the scene using the provided renderer
+        }
+        requestAnimationFrame(wiktorAnimate);
+    }
+    
+    // Optional: Handle window resize to keep the viewer responsive
+    window.addEventListener('resize', () => {
+        const jaroslawNewWidth = jaroslawDiv.clientWidth;
+        const jaroslawNewHeight = jaroslawDiv.clientHeight;
+        const hannaNewWidth = hannaDiv.clientWidth;
+        const hannaNewHeight = hannaDiv.clientHeight;
+        const kacperNewWidth = kacperDiv.clientWidth;
+        const kacperNewHeight = kacperDiv.clientHeight;
+        const paulinaNewWidth = paulinaDiv.clientWidth;
+        const paulinaNewHeight = paulinaDiv.clientHeight; 
+        const tosiaNewWidth = tosiaDiv.clientWidth;
+        const tosiaNewHeight = tosiaDiv.clientHeight;
+        const wiktorNewWidth = wiktorDiv.clientWidth;
+        const wiktorNewHeight = wiktorDiv.clientHeight;
+
+        jaroslawRenderer.setSize(jaroslawNewWidth, jaroslawNewHeight);
+        hannaRenderer.setSize(hannaNewWidth, hannaNewHeight);
+        kacperRenderer.setSize(kacperNewWidth, kacperNewHeight);
+        paulinaRenderer.setSize(paulinaNewWidth, paulinaNewHeight);
+        tosiaRenderer.setSize(tosiaNewWidth, tosiaNewHeight);
+        wiktorRenderer.setSize(wiktorNewWidth, wiktorNewHeight);
+
+        jaroslawCamera.aspect = jaroslawNewWidth / jaroslawNewHeight;
+        jaroslawCamera.updateProjectionMatrix();
+        hannaCamera.aspect = hannaNewWidth / hannaNewHeight;
+        hannaCamera.updateProjectionMatrix();
+        kacperCamera.aspect = kacperNewWidth / kacperNewHeight;
+        kacperCamera.updateProjectionMatrix();
+        paulinaCamera.aspect = paulinaNewWidth / paulinaNewHeight;
+        paulinaCamera.updateProjectionMatrix();
+        tosiaCamera.aspect = tosiaNewWidth / tosiaNewHeight;
+        tosiaCamera.updateProjectionMatrix();
+        wiktorCamera.aspect = wiktorNewWidth / wiktorNewHeight;
+        wiktorCamera.updateProjectionMatrix();
+    });
+</script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">HuSc3D: Human Sculpture dataset for 3D object reconstruction</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=3glCXHwAAAAJ">Weronika Smolak-Dyżewska</a>,</span>
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/dawid-malarz/">Dawid Malarz</a>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=cMUzSyUAAAAJ">Grzegorz Wilczyński</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/rafal-tobiasz/">Rafał Tobiasz</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=eatkjjEAAAAJ">Joanna Waczyńska</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=ktQi2u4AAAAJ&hl">Piotr Borycki</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.pl/citations?user=0kp0MbgAAAAJ">Przemysław Spurek</a>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Jagiellonian University</span>
+          </div>
+
+          <div class="column has-text-centered">
+              <span class="link-block">
+                <span class="disable-links">
+                  <a href="https://arxiv.org/abs/2011.12948"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv (coming soon)</span>
+                  </a>
+                </span>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/wMito/HuSc3D"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/rafal-tobiasz/HuSc3D"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="./static/images/ojciec_siedzacy-image.jpg"
+      class="interpolation-image"
+      alt="Interpolate start reference image."
+      />
+      <h2 class="subtitle has-text-centered">
+        The <span class="dnerf">HuSc3D</span> dataset is designed for 3D reconstruction from 2D images, simulating a
+        realistic acquisition process of an inexperienced user. The dataset includes six human-like sculptures
+        created by Paweł Althamer. 
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+          3D scene reconstruction from 2D images is one of the most important tasks in computer graphics. Unfortunately, existing datasets and benchmarks concentrate on idealized synthetic or meticulously captured realistic data.  Such benchmarks fail to convey the inherent complexities encountered in newly acquired real-world scenes. In such scenes especially those acquired outside, the background is often dynamic, and by popular usage of cell phone cameras, there might be discrepancies in, e.g., white balance. 
+          </p>
+          <p>
+          To address this gap, we present HuSc3D, a novel dataset specifically designed for rigorous benchmarking of 3D reconstruction models under realistic acquisition challenges. Our dataset uniquely features six highly detailed, fully white sculptures characterized by intricate perforations and minimal textural and color variation. Furthermore, the number of images per scene varies significantly, introducing the additional challenge of limited training data for some instances alongside scenes with a standard number of views. By evaluating popular 3D reconstruction methods on this diverse dataset, we demonstrate the distinctiveness of HuSc3D in effectively differentiating model performance, particularly highlighting the sensitivity of methods to fine geometric details, color ambiguity, and varying data availability – limitations often masked by more conventional datasets.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">HuSc3D Scenes</h2>
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Jarosław</h2>
+          <div id="jaroslaw-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Hanna</h2>
+          <div id="hanna-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Kacper</h2>
+          <div id="kacper-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Paulina</h2>
+          <div id="paulina-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Tosia</h2>
+          <div id="tosia-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Wiktor</h2>
+          <div id="wiktor-viewer" style="height: 33vh;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Concurrent Work. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Related Links</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            There's a lot of excellent work that was introduced around the same time as ours.
+          </p>
+          <p>
+            <a href="https://arxiv.org/abs/2104.09125">Progressive Encoding for Neural Optimization</a> introduces an idea similar to our windowed position encoding for coarse-to-fine optimization.
+          </p>
+          <p>
+            <a href="https://www.albertpumarola.com/research/D-NeRF/index.html">D-NeRF</a> and <a href="https://gvv.mpi-inf.mpg.de/projects/nonrigid_nerf/">NR-NeRF</a>
+            both use deformation fields to model non-rigid scenes.
+          </p>
+          <p>
+            Some works model videos with a NeRF by directly modulating the density, such as <a href="https://video-nerf.github.io/">Video-NeRF</a>, <a href="https://www.cs.cornell.edu/~zl548/NSFF/">NSFF</a>, and <a href="https://neural-3d-video.github.io/">DyNeRF</a>
+          </p>
+          <p>
+            There are probably many more by the time you are reading this. Check out <a href="https://dellaert.github.io/NeRF/">Frank Dellart's survey on recent NeRF papers</a>, and <a href="https://github.com/yenchenlin/awesome-NeRF">Yen-Chen Lin's curated list of NeRF papers</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Concurrent Work. -->
+
+  </div>
+</section>
+
+
+<!-- <section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{park2021nerfies,
+  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
+  title     = {Nerfies: Deformable Neural Radiance Fields},
+  journal   = {ICCV},
+  year      = {2021},
+}</code></pre>
+  </div>
+</section> -->
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        This website is based on <a href="https://nerfies.github.io/">Nerfies</a> website template.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
