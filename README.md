@@ -13,8 +13,8 @@ Weronika Smolak-Dyżewska, Dawid Malarz, Grzegorz Wilczyński, Rafał Tobiasz, J
 This repository contains the code for evaluation made for benchmarking with HuSc3D dataset.
 Link to dataset: https://huggingface.co/datasets/rafal-tobiasz/HuSc3D
 
-<img src="./assets/jaroslaw.gif" height=300px />
-<img src="./assets/wiktor.gif" height=300px />
+<img src="./assets/jaroslaw.gif" width=50% />
+<img src="./assets/wiktor.gif" width=50% />
 
 **Abstract:** 3D scene reconstruction from 2D images is one of the most important tasks in computer graphics. Unfortunately, existing datasets and benchmarks concentrate on idealized synthetic or meticulously captured realistic data. Such benchmarks fail to convey the inherent complexities encountered in newly acquired real-world scenes. In such scenes especially those acquired outside, the background is often dynamic, and by popular usage of cell phone cameras, there might be discrepancies in, e.g., white balance.
 
