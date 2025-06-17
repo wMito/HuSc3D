@@ -19,7 +19,20 @@ Link to dataset: https://huggingface.co/datasets/rafal-tobiasz/HuSc3D
 
 To address this gap, we present HuSc3D, a novel dataset specifically designed for rigorous benchmarking of 3D reconstruction models under realistic acquisition challenges. Our dataset uniquely features six highly detailed, fully white sculptures characterized by intricate perforations and minimal textural and color variation. Furthermore, the number of images per scene varies significantly, introducing the additional challenge of limited training data for some instances alongside scenes with a standard number of views. By evaluating popular 3D reconstruction methods on this diverse dataset, we demonstrate the distinctiveness of HuSc3D in effectively differentiating model performance, particularly highlighting the sensitivity of methods to fine geometric details, color ambiguity, and varying data availability – limitations often masked by more conventional datasets.
 
+ <h2 class="title">How to evaluate</h2>
+ In order to reproduce our results, we share bash scripts used to run 2DGS, Mip-Splatting and Nerfstudio methods. ```2dgs_benchmark/2dgs.sbatch``` , ```mip_splatting_benchmark/mipsplat.sbatch``` and ```nerfstudio.sbatch``` are scripts used on our computational cluster. However, without lines with #SBATCH instructions they can be used like a normal bash script. For Nerfstudio methods, you can use ```nerfstudio_benchmark/nerfstudio.sh``` directly as such:
+ 
+ ```bash
+ bash nerfstudio_benchmark/nerfstudio.sh
+ ```
 
+ In order to correctly run any of these methods, you should run these scrips after activating environment made following instructions from original repositories (<a href="https://github.com/autonomousvision/mip-splatting">Mip-Splatting</a>, <a href="https://github.com/hbb1/2d-gaussian-splatting">2DGS</a>, <a href="https://github.com/nerfstudio-project/nerfstudio">Nerfstudio</a>) and cloning their repository.
+
+ For our evaluation we needed to make slight changes to 2DGS and Mip-Splatting code in order to record training time and FPS. To modify these original repositories use provided ```.patch``` files as such:
+ ```bash
+ cd 2d-gaussian-splatting
+ git apply 2dgs_benchmark/2dgs_changes.patch
+ ``` 
 
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
