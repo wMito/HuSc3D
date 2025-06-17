@@ -29,7 +29,7 @@ In order to reproduce our results, we share bash scripts used to run 2DGS, Mip-S
 
  In order to correctly run any of these methods, you should run these scrips after activating environment made following instructions from original repositories (<a href="https://github.com/autonomousvision/mip-splatting">Mip-Splatting</a>, <a href="https://github.com/hbb1/2d-gaussian-splatting">2DGS</a>, <a href="https://github.com/nerfstudio-project/nerfstudio">Nerfstudio</a>) and cloning their repository.
 
- For our evaluation, we needed to make slight changes to 2DGS and Mip-Splatting code to record training time and FPS. To modify these original repositories, usethe  provided ```.patch``` files as such:
+ For our evaluation, we needed to make slight changes to 2DGS and Mip-Splatting code to record training time and FPS. To modify these original repositories, use the  provided ```.patch``` files as such:
  ```bash
  cd 2d-gaussian-splatting
  git apply 2dgs_benchmark/2dgs_changes.patch
